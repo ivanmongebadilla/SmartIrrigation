@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import type { Zone } from "../types";
 
 function buildSeries(zones: Zone[]) {
@@ -20,18 +20,28 @@ function buildSeries(zones: Zone[]) {
 
 export default function MoistureChart({ zones }: { zones: Zone[] }) {
   const data = useMemo(() => buildSeries(zones), [zones]);
-  const strokeColor = "#6ee7b7";
+  const strokeColor = "#34d399";
 
   return (
-    <div className="w-full h-24 sm:h-28">
+    <div className="w-full h-48 sm:h-56">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 4 }}>
-          <CartesianGrid stroke="transparent" />
-          <XAxis dataKey="time" tick={{ fill: "#cbd5c1", fontSize: 12 }} axisLine={false} />
-          <YAxis tick={{ fill: "#cbd5c1", fontSize: 12 }} axisLine={false} unit="%" />
-          <Tooltip wrapperStyle={{ background: "#0b0b0b", border: "1px solid #222" }} labelStyle={{ color: "#cbd5c1" }} />
-          <Line type="monotone" dataKey="moisture" stroke={strokeColor} strokeWidth={2.5} dot={false} />
-        </LineChart>
+        <AreaChart data={data} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
+          <defs>
+            <linearGradient id="moistureFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={strokeColor} stopOpacity={0.35} />
+              <stop offset="100%" stopColor={strokeColor} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="time" tick={{ fill: "#71717a", fontSize: 11 }} axisLine={false} tickLine={false} interval={2} />
+          <YAxis tick={{ fill: "#71717a", fontSize: 11 }} axisLine={false} tickLine={false} unit="%" width={38} />
+          <Tooltip
+            contentStyle={{ background: "#18181b", border: "1px solid #3f3f46", borderRadius: 8, fontSize: 12 }}
+            labelStyle={{ color: "#a1a1aa" }}
+            itemStyle={{ color: "#34d399" }}
+          />
+          <Area type="monotone" dataKey="moisture" stroke={strokeColor} strokeWidth={2} fill="url(#moistureFill)" dot={false} />
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );

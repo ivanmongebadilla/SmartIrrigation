@@ -1,29 +1,50 @@
 import React from "react";
 import type { Zone } from "../types";
 
-function zoneColor(m: number) {
-  if (m < 25) return "#6b0f0f"; // muted red
-  if (m < 35) return "#7a5b1a"; // amber
-  return "#20504f"; // muted green
+function statusStyle(status: Zone["sensorStatus"]) {
+  if (status === "critical") return { bg: "bg-red-950/60", border: "border-red-800/60", dot: "bg-red-400", label: "Crítico" };
+  if (status === "warning") return { bg: "bg-amber-950/50", border: "border-amber-800/50", dot: "bg-amber-400", label: "Aviso" };
+  return { bg: "bg-emerald-950/40", border: "border-emerald-900/50", dot: "bg-emerald-400", label: "Saludable" };
 }
+
+const LEGEND: Array<{ dot: string; label: string }> = [
+  { dot: "bg-emerald-400", label: "Saludable" },
+  { dot: "bg-amber-400", label: "Aviso" },
+  { dot: "bg-red-400", label: "Crítico" },
+];
 
 export default function FieldMap({ zones, onSelect, selectedZone }: { zones: Zone[]; onSelect: (id: string) => void; selectedZone: string | null }) {
   return (
     <div className="w-full">
-      <div className="bg-black/40 p-4 rounded-md">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 max-h-[420px] overflow-y-auto p-2">
-          {zones.map((z) => {
-            const fill = zoneColor(z.moisture);
-            const isSelected = selectedZone === z.id;
-            return (
-              <button key={z.id} onClick={() => onSelect(z.id)} className={`text-left p-4 rounded-md transition-colors border ${isSelected ? 'ring-2 ring-white/20' : 'border-transparent'}`} style={{ background: fill }}>
-                <div className="text-sm text-zinc-100 font-semibold">{z.name}</div>
-                <div className="text-2xl font-bold text-white mt-2">{Math.round(z.moisture)}%</div>
-                <div className="text-xs text-zinc-200 mt-1">{z.sensorStatus === 'operational' ? 'Saludable' : z.sensorStatus === 'warning' ? 'Aviso' : 'Crítico'}</div>
-              </button>
-            );
-          })}
-        </div>
+      <div className="flex items-center gap-4 mb-3">
+        {LEGEND.map((l) => (
+          <div key={l.label} className="flex items-center gap-1.5 text-xs text-zinc-400">
+            <span className={`w-2 h-2 rounded-full ${l.dot}`} />
+            {l.label}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        {zones.map((z) => {
+          const s = statusStyle(z.sensorStatus);
+          const isSelected = selectedZone === z.id;
+          return (
+            <button
+              key={z.id}
+              onClick={() => onSelect(z.id)}
+              className={`text-left p-3.5 rounded-lg border transition-all ${s.bg} ${
+                isSelected ? "border-emerald-400/60 ring-1 ring-emerald-400/40" : `${s.border} hover:border-zinc-600`
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-xs font-medium text-zinc-300 truncate">{z.name}</div>
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.dot}`} />
+              </div>
+              <div className="text-2xl font-bold text-zinc-50 mt-1.5">{Math.round(z.moisture)}%</div>
+              <div className="text-[11px] text-zinc-400 mt-1">{s.label}</div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
