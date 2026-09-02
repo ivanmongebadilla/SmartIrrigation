@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createMockState } from "../data/mockData";
-import type { DashboardState, AIRecommendation, Zone } from "../types";
+import type { DashboardState, AIRecommendation, Zone, SensorReading } from "../types";
 
 export function useMockData() {
   // Start with a deterministic, empty placeholder during SSR to avoid hydration mismatch.
@@ -44,7 +44,7 @@ export function useMockData() {
           } as Zone;
         });
 
-        const sensors = zones.flatMap((z) => [
+        const sensors: SensorReading[] = zones.flatMap((z) => [
           { zoneId: z.id, type: "moisture", value: z.moisture, timestamp: Date.now() },
           { zoneId: z.id, type: "temperature", value: z.temperature, timestamp: Date.now() },
           { zoneId: z.id, type: "humidity", value: z.humidity, timestamp: Date.now() },
